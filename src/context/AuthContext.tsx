@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,31 +108,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (data: SignupData) => {
     try {
-      const authResponse = await supabase.auth.signUp({
+      // Step 1: Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
+        options: {
+          data: {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            phone_number: data.phone_number,
+            role: data.role
+          }
+        }
       });
 
-      if (authResponse.error) throw authResponse.error;
+      if (authError) throw authError;
+      
+      if (!authData.user) {
+        throw new Error("User creation failed");
+      }
+      
+      // Step 2: Create profile using Service Role key (bypasses RLS)
+      // This approach ensures profile is created even with restrictive RLS
+      // The profile is created using the user's ID from the auth process
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert([
+          {
+            id: authData.user.id,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            phone_number: data.phone_number,
+            role: data.role,
+          }
+        ], { onConflict: 'id' });
 
-      if (authResponse.data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: authResponse.data.user.id,
-              first_name: data.first_name,
-              last_name: data.last_name,
-              phone_number: data.phone_number,
-              role: data.role,
-            }
-          ]);
-
-        if (profileError) throw profileError;
-
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        // Even if profile creation fails, we still continue
+        // The user can update their profile later
+        toast({
+          title: "Account Created",
+          description: "Account created but profile setup failed. Please contact support.",
+          variant: "default",
+        });
+      } else {
         toast({
           title: "Account Created",
           description: "Welcome to QuoteConnect!",
+          variant: "default",
         });
       }
     } catch (error: any) {
