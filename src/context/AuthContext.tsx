@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +6,6 @@ export type UserRole = 'customer' | 'vendor' | 'intern' | null;
 
 interface User {
   id: string;
-  email: string;
   first_name: string;
   last_name: string;
   phone_number: string;
@@ -41,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         getUserProfile(session.user.id);
@@ -49,7 +46,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         getUserProfile(session.user.id);
@@ -77,7 +73,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (data) {
       setUser({
         id: userId,
-        email: data.email,
         first_name: data.first_name,
         last_name: data.last_name,
         phone_number: data.phone_number,

@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import InternDashboard from "@/components/intern/Dashboard";
@@ -22,7 +21,7 @@ const Dashboard = () => {
             </div>
             
             <div className="p-12 text-center border rounded-lg bg-white">
-              <h2 className="text-xl font-medium mb-4">Welcome, {user.name}</h2>
+              <h2 className="text-xl font-medium mb-4">Welcome, {user.first_name}</h2>
               <p className="text-gray-600 mb-6">
                 Get started by submitting a new product for quotes or review your past submissions.
               </p>
@@ -43,7 +42,7 @@ const Dashboard = () => {
             </div>
             
             <div className="p-12 text-center border rounded-lg bg-white">
-              <h2 className="text-xl font-medium mb-4">Welcome, {user.name}</h2>
+              <h2 className="text-xl font-medium mb-4">Welcome, {user.first_name}</h2>
               <p className="text-gray-600 mb-6">
                 Review and submit quotes for products assigned to you.
               </p>

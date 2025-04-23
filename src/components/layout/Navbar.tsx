@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -25,12 +24,8 @@ export default function Navbar() {
 
   // Get user initials for avatar
   const getInitials = () => {
-    if (!user?.name) return "U";
-    return user.name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    if (!user?.first_name) return "U";
+    return `${user.first_name[0]}${user.last_name?.[0] || ''}`.toUpperCase();
   };
 
   return (
@@ -74,7 +69,7 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>
-                    <div>{user?.name}</div>
+                    <div>{user?.first_name} {user?.last_name}</div>
                     <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -138,7 +133,7 @@ export default function Navbar() {
                     <AvatarFallback>{getInitials()}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{user?.name}</div>
+                    <div className="font-medium">{user?.first_name} {user?.last_name}</div>
                     <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
                   </div>
                 </div>
