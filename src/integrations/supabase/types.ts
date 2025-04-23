@@ -9,7 +9,113 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          first_name: string
+          id: string
+          last_name: string | null
+          phone_number: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          first_name: string
+          id: string
+          last_name?: string | null
+          phone_number: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string | null
+          phone_number?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          price: number
+          product_id: string
+          status: string | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          price: number
+          product_id: string
+          status?: string | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          price?: number
+          product_id?: string
+          status?: string | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +124,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "customer" | "vendor" | "intern"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +239,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["customer", "vendor", "intern"],
+    },
   },
 } as const
