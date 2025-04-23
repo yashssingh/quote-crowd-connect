@@ -40,18 +40,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        getUserProfile(session.user.id);
-      }
-      setLoading(false);
-    });
-
+    // Set up auth state listener FIRST to prevent missing auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         getUserProfile(session.user.id);
       } else {
         setUser(null);
+      }
+      setLoading(false);
+    });
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        getUserProfile(session.user.id);
       }
       setLoading(false);
     });
@@ -128,12 +130,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error("User creation failed");
       }
       
-      // Step 2: Create profile using Service Role key (bypasses RLS)
-      // This approach ensures profile is created even with restrictive RLS
+      // Step 2: Create profile using the RLS policy we just added
       // The profile is created using the user's ID from the auth process
       const { error: profileError } = await supabase
         .from('profiles')
-        .upsert([
+        .insert([
           {
             id: authData.user.id,
             first_name: data.first_name,
@@ -141,7 +142,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             phone_number: data.phone_number,
             role: data.role,
           }
-        ], { onConflict: 'id' });
+        ]);
 
       if (profileError) {
         console.error("Profile creation error:", profileError);
@@ -150,7 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast({
           title: "Account Created",
           description: "Account created but profile setup failed. Please contact support.",
-          variant: "default",
+          variant: "destructive",
         });
       } else {
         toast({
